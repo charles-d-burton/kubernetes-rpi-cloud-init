@@ -1,0 +1,86 @@
+#cloud-config
+# vim: syntax=yaml
+#
+hostname: kube-master
+manage_etc_hosts: true
+
+resize_rootfs: true
+growpart:
+    mode: auto
+    devices: ["/"]
+    ignore_growroot_disabled: false
+
+users:
+  - name: charles
+    gecos: "Kubernetes Master"
+    sudo: ALL=(ALL) NOPASSWD:ALL
+    shell: /bin/bash
+    groups: users,docker,adm,dialout,audio,plugdev,netdev,video
+    plain_text_passwd: hypriot
+    lock_passwd: false
+    ssh_pwauth: true
+    chpasswd: { expire: false }
+    ssh_pwauth: true
+    ssh-import-id: None
+    ssh-authorized-keys:
+      - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDlLMVNsD6lOcKSIPrZ+99qDsRfMayOMOQWFZqeXbQvOGh/cVNC3hfPAC4if8q1TqWswPhCC7QbFRSx7LNCVQ8RidQwmvQWCZS9mk+1dfqIjCHGGIc5ZynbpIujiv9yAhRHtldiez9NkmrhOUb31/gw8SeBmk7AmSgtrvHANmDFNNAfC9HBMIUYZ39o+JvkDH4GOb2tpMaKLvoEInzwJX/1VKFsUnFoYOGTZkHdpwVQOspw8C6IoORWPYSi+0ZYBhDwb5HgblLE8m86bXE3x4CpXFeLKdlHEJdMl6L8s9ollcaqoJZnQrygPNF/BCqW7KDDsPOVPPFIRUixFr1JHkN3 charles@charles-work
+      - 
+
+package_upgrade: false
+package_update: false
+package_reboot_if_required: false
+packages:
+  - ntp
+
+locale: "en_US.UTF-8"
+timezone: "America/Denver"
+
+runcmd:
+  - [
+      curl, 
+      -s, 
+      https://packages.cloud.google.com/apt/doc/apt-key.gpg, 
+      "|", 
+      apt-key, 
+      add,
+      -y,
+      "-"
+    ]
+  - [
+    echo,
+    "deb http://apt.kubernetes.io/ kubernetes-xenial main",
+    ">",
+     /etc/apt/sources.list.d/kubernetes.list
+    ]
+  - [
+      apt-get,
+      update
+    ]
+  - [
+      apt-get,
+      install,
+      -y,
+      kubeadm
+    ]
+  - [
+      kubeadm,
+      init,
+      "--pod-network-cidr",
+      "10.100,0.0/16"
+    ]
+  - [
+      cp,
+      "/etc/kubernetes/admin.conf",
+      "/home/charles/admin.conf"   
+    ]
+  - [
+      chown,
+      "charles:charles",
+      "/home/charles/admin.conf"
+    ]
+  - [
+      echo,
+      "KUBECONFIG=/home/charles/admin.conf",
+      ">>",
+      "/home/charles/.bashrc"
+    ]
