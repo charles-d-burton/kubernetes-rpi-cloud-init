@@ -45,3 +45,4 @@ runcmd:
   - 'cp /etc/kubernetes/admin.conf /home/pirate/.kube/config'
   - 'chown pirate:pirate /home/pirate/.kube/config'
   - 'openssl req -x509 -nodes -days 365 -newkey rsa:2048 -subj "/C=US/ST=Denial/L=ST/O=Dis/CN=kube-master" -keyout /etc/ssl/private/nginx-selfsigned.key -out /etc/ssl/certs/nginx'
+  - 'grep "kubeadm join" /var/log/cloud-init-output.log | awk '{$1=$1};1' > /var/www/html/kube.html'
