@@ -39,12 +39,9 @@ runcmd:
   - 'echo "deb http://apt.kubernetes.io/ kubernetes-xenial main" > /etc/apt/sources.list.d/kubernetes.list'
   - 'apt-get update'
   - 'apt-get -y upgrade'
-  - 'apt-get install -y kubeadm'
-  - 'kubeadm init --pod-network-cidr 10.100.0.0/16'
-  # The next two steps are necessary because of a timing issue with kubernetes
-  # It resets and re-initializes the cluster
-  - 'kubeadm reset -f'
-  - 'kubeadm init --pod-network-cidr 10.100.0.0/16'
+  - 'apt-get install -y kubeadm nginx'
+  - 'kubeadm init'
   - 'mkdir -p /home/pirate/.kube'
   - 'cp /etc/kubernetes/admin.conf /home/pirate/.kube/config'
   - 'chown pirate:pirate /home/pirate/.kube/config'
+  - 'openssl req -x509 -nodes -days 365 -newkey rsa:2048 -subj "/C=US/ST=Denial/L=ST/O=Dis/CN=kube-master" -keyout /etc/ssl/private/nginx-selfsigned.key -out /etc/ssl/certs/nginx'
