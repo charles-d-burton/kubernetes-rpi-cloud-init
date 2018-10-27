@@ -41,6 +41,10 @@ runcmd:
   - 'apt-get -y upgrade'
   - 'apt-get install -y kubeadm'
   - 'kubeadm init --pod-network-cidr 10.100.0.0/16'
-  - 'cp /etc/kubernetes/admin.conf /home/pirate/admin.conf'
-  - 'chown pirate:pirate /home/pirate/admin.conf'
-  - 'echo "KUBECONFIG=/home/pirate/admin.conf" >> /home/pirate/.bashrc'
+  # The next two steps are necessary because of a timing issue with kubernetes
+  # It resets and re-initializes the cluster
+  - 'kubeadm reset -f'
+  - 'kubeadm init --pod-network-cidr 10.100.0.0/16'
+  - 'mkdir -p /home/pirate/.kube'
+  - 'cp /etc/kubernetes/admin.conf /home/pirate/.kube/config'
+  - 'chown pirate:pirate /home/pirate/.kube/config'
