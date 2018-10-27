@@ -11,7 +11,7 @@ growpart:
     ignore_growroot_disabled: false
 
 users:
-  - name: charles
+  - name: pirate
     gecos: "Kubernetes Master"
     sudo: ALL=(ALL) NOPASSWD:ALL
     shell: /bin/bash
@@ -24,63 +24,23 @@ users:
     ssh-import-id: None
     ssh-authorized-keys:
       - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDlLMVNsD6lOcKSIPrZ+99qDsRfMayOMOQWFZqeXbQvOGh/cVNC3hfPAC4if8q1TqWswPhCC7QbFRSx7LNCVQ8RidQwmvQWCZS9mk+1dfqIjCHGGIc5ZynbpIujiv9yAhRHtldiez9NkmrhOUb31/gw8SeBmk7AmSgtrvHANmDFNNAfC9HBMIUYZ39o+JvkDH4GOb2tpMaKLvoEInzwJX/1VKFsUnFoYOGTZkHdpwVQOspw8C6IoORWPYSi+0ZYBhDwb5HgblLE8m86bXE3x4CpXFeLKdlHEJdMl6L8s9ollcaqoJZnQrygPNF/BCqW7KDDsPOVPPFIRUixFr1JHkN3 charles@charles-work
-      - 
+      - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDk0BGMHuH5t8YAm98KSyuP48HNvgbpSr8uj2iQ9zWx5luk6yMdcxRnvgHj0zO55bW5ctCg/d0eJmqRnz11L35wJ71jYzyAGyUMCGxZ+91JroNi0GcHAL6tAI/Y4MlDGz+4nzR6NQkeN4EQAbyYJwINGT9oA3H4w6KgLF1bXwSiaY3sek92cwxka7aCSQgI/dGhJA81cI875604R1T5bmkjkd31ZGHr8pE+5UdXNrlj/mH74neDKNsVuhHZJimQqYLl/yIvWQhiTpQPnm9mTtMte/ku3rP+KMP77o4KZa9H7IP0Og8NqI3uXqv0TpLWo31JuPnFWWgSkJFzzKfy5KUr charles.d.burton@gmail.com
 
-package_upgrade: false
-package_update: false
-package_reboot_if_required: false
-packages:
-  - ntp
+package_upgrade: true
+package_update: true
+package_reboot_if_required: true
 
 locale: "en_US.UTF-8"
 timezone: "America/Denver"
 
 runcmd:
-  - [
-      curl, 
-      -s, 
-      https://packages.cloud.google.com/apt/doc/apt-key.gpg, 
-      "|", 
-      apt-key, 
-      add,
-      -y,
-      "-"
-    ]
-  - [
-    echo,
-    "deb http://apt.kubernetes.io/ kubernetes-xenial main",
-    ">",
-     /etc/apt/sources.list.d/kubernetes.list
-    ]
-  - [
-      apt-get,
-      update
-    ]
-  - [
-      apt-get,
-      install,
-      -y,
-      kubeadm
-    ]
-  - [
-      kubeadm,
-      init,
-      "--pod-network-cidr",
-      "10.100,0.0/16"
-    ]
-  - [
-      cp,
-      "/etc/kubernetes/admin.conf",
-      "/home/charles/admin.conf"   
-    ]
-  - [
-      chown,
-      "charles:charles",
-      "/home/charles/admin.conf"
-    ]
-  - [
-      echo,
-      "KUBECONFIG=/home/charles/admin.conf",
-      ">>",
-      "/home/charles/.bashrc"
-    ]
+  - 'systemctl restart ntp'
+  - 'curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -'
+  - 'echo "deb http://apt.kubernetes.io/ kubernetes-xenial main" > /etc/apt/sources.list.d/kubernetes.list'
+  - 'apt-get update'
+  - 'apt-get -y upgrade'
+  - 'apt-get install -y kubeadm'
+  - 'kubeadm init --pod-network-cidr 10.100.0.0/16'
+  - 'cp /etc/kubernetes/admin.conf /home/pirate/admin.conf'
+  - 'chown pirate:pirate /home/pirate/admin.conf'
+  - 'echo "KUBECONFIG=/home/pirate/admin.conf" >> /home/pirate/.bashrc'
