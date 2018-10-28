@@ -1,7 +1,7 @@
 #cloud-config
 # vim: syntax=yaml
 #
-hostname: kube-master
+hostname: kube-node1
 manage_etc_hosts: true
 
 resize_rootfs: true
@@ -16,9 +16,7 @@ network:
     - type: physical
       name: eth0
       subnets:
-        - type: static
-          address: 192.168.10.129/20
-          gateway: 192.168.1.1
+        - type: dhcp
           dns_nameservers:
             - 192.168.1.1
             - 8.8.8.8
@@ -55,9 +53,6 @@ runcmd:
   - 'apt-get update'
   - 'apt-get -y upgrade'
   - 'apt-get install -y kubeadm nginx'
-  - 'kubeadm init'
   - 'mkdir -p /home/pirate/.kube'
-  - 'cp /etc/kubernetes/admin.conf /home/pirate/.kube/config'
-  - 'chown pirate:pirate /home/pirate/.kube/config'
-  - 'openssl req -x509 -nodes -days 365 -newkey rsa:2048 -subj "/C=US/ST=Denial/L=ST/O=Dis/CN=kube-master" -keyout /etc/ssl/private/nginx-selfsigned.key -out /etc/ssl/certs/nginx'
-  - 'grep "kubeadm join" /var/log/cloud-init-output.log | awk ''{$1=$1};1'' > /var/www/html/kube.html'
+  - 'until "$(curl -s --head --fail http://192.168.10.129/kube.html)"; do echo "waiting for kube master"; sleep 5; done'
+  - '$(curl -s http://192.168.10.129/kube.html)'
