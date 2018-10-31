@@ -1,7 +1,7 @@
 #cloud-config
 # vim: syntax=yaml
 #
-hostname: kube-node1
+hostname: kube-node3
 manage_etc_hosts: true
 
 resize_rootfs: true
@@ -50,8 +50,8 @@ runcmd:
   - 'systemctl restart ntp'
   - 'modprobe ip_vs_rr'
   - 'modprobe ip_vs_wrr'
-  - 'modprobe 'ip_vs_sh'
-  - 'modprobe 'ip_vs'
+  - 'modprobe ip_vs_sh'
+  - 'modprobe ip_vs'
   - 'echo "ip_vs_rr" >> /etc/modules'
   - 'echo "ip_vs_wrr" >> /etc/modules'
   - 'echo "ip_vs_sh" >> /etc/modules'
@@ -62,7 +62,6 @@ runcmd:
   - 'curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -'
   - 'echo "deb http://apt.kubernetes.io/ kubernetes-xenial main" > /etc/apt/sources.list.d/kubernetes.list'
   - 'apt-get update'
-  - 'apt-get -y upgrade'
   - 'apt-get install -y kubeadm'
   - 'mkdir -p /home/pirate/.kube'
   - 'until curl -s --fail http://192.168.10.129/kube.html; do echo "waiting for kube master"; sleep 5; done'
