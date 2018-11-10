@@ -66,3 +66,5 @@ runcmd:
   - 'mkdir -p /home/pirate/.kube'
   - 'until curl -s --fail http://192.168.10.129/kube.html; do echo "waiting for kube master"; sleep 5; done'
   - '$(curl -s http://192.168.10.129/kube.html)'
+
+  
