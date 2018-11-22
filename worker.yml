@@ -38,10 +38,11 @@ users:
     ssh-authorized-keys:
       - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDlLMVNsD6lOcKSIPrZ+99qDsRfMayOMOQWFZqeXbQvOGh/cVNC3hfPAC4if8q1TqWswPhCC7QbFRSx7LNCVQ8RidQwmvQWCZS9mk+1dfqIjCHGGIc5ZynbpIujiv9yAhRHtldiez9NkmrhOUb31/gw8SeBmk7AmSgtrvHANmDFNNAfC9HBMIUYZ39o+JvkDH4GOb2tpMaKLvoEInzwJX/1VKFsUnFoYOGTZkHdpwVQOspw8C6IoORWPYSi+0ZYBhDwb5HgblLE8m86bXE3x4CpXFeLKdlHEJdMl6L8s9ollcaqoJZnQrygPNF/BCqW7KDDsPOVPPFIRUixFr1JHkN3 charles@charles-work
       - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDk0BGMHuH5t8YAm98KSyuP48HNvgbpSr8uj2iQ9zWx5luk6yMdcxRnvgHj0zO55bW5ctCg/d0eJmqRnz11L35wJ71jYzyAGyUMCGxZ+91JroNi0GcHAL6tAI/Y4MlDGz+4nzR6NQkeN4EQAbyYJwINGT9oA3H4w6KgLF1bXwSiaY3sek92cwxka7aCSQgI/dGhJA81cI875604R1T5bmkjkd31ZGHr8pE+5UdXNrlj/mH74neDKNsVuhHZJimQqYLl/yIvWQhiTpQPnm9mTtMte/ku3rP+KMP77o4KZa9H7IP0Og8NqI3uXqv0TpLWo31JuPnFWWgSkJFzzKfy5KUr charles.d.burton@gmail.com
+      - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC6IjKyB0uDduqQ/yUwjSReek4Q08TmyZeXVOY2aWXtCT0CGaf0feJ2ks3K0FYXQblvhnLYumtATkpn/u+ASBwVQR3BGeTniVyM/7kDgIAhBb2GEX7g/2z6xv0V76ldd3uSgNM2yLBzgdkyVaGi6QH2TDj+deeecyJZYBD0OhArrM4i9v+7r/U9E72TyexPt3aVG9WXKjFwUY8ovcVYTzLGA2O+aA16Ggj9E+mhMhfZUlFKayGc+VzDVLjKnMeiboxhJGqTSYJrNB3GaynhyE3V4X7QDC4RMFmcXUzRVnVujNPt+/ftYfvmvlk5Pfy5mv6XcVT287pvHyKbkz/XTCwl charles@charles-laptop-5520
 
-package_upgrade: true
-package_update: true
-package_reboot_if_required: true
+package_upgrade: false
+package_update: false
+package_reboot_if_required: false
 
 locale: "en_US.UTF-8"
 timezone: "America/Denver"
@@ -59,10 +60,17 @@ runcmd:
   - 'echo "net.ipv4.ip_forward=1" >> /etc/sysctl.conf'
   - 'echo "net.bridge.bridge-nf-call-iptables=1" >> /etc/sysctl.conf'
   - 'sysctl -p'
+  - 'echo "Package: docker-ce" >> /etc/apt/preferences.d/docker'
+  - 'echo "Pin: version 18.06.1~ce~3-0~raspbian" >> /etc/apt/preferences.d/docker'
+  - 'echo "Pin-Priority: 1002" >> /etc/apt/preferences.d/docker'
+  - 'apt update'
+  - 'apt -y upgrade'
   - 'curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -'
   - 'echo "deb http://apt.kubernetes.io/ kubernetes-xenial main" > /etc/apt/sources.list.d/kubernetes.list'
-  - 'apt-get update'
-  - 'apt-get install -y kubeadm'
+  - 'apt update'
+  - 'apt install -y kubeadm'
   - 'mkdir -p /home/pirate/.kube'
   - 'until curl -s --fail http://192.168.10.129/kube.html; do echo "waiting for kube master"; sleep 5; done'
   - '$(curl -s http://192.168.10.129/kube.html)'
+  - 'sleep 10'
+  - 'reboot'
